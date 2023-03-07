@@ -2,17 +2,17 @@
 
 **This is a basic Django application that I've developed for the IoT Core Developer Test case. As specified in the case description, the application consumes data from the MQTT server `mqtt.hsl.fi`, and makes the data available through a REST API. The MQTT server provides high-frequency positioning data for public transport vehicles in the Helsinki-area. This is my first time writing a Django application, so this is only a proof of concept with limited functionality.**
 
-The database model for this application consist of a single table with the following attributes: _busID_, _route_, _operator_, _location_, _updated_ and _lastStop_. If we where to extend the fuctionality of this application it would obvisoly not be a good solution, but since this only is for demonstrational purposes, the single table will do just fine.
+The database model for this application consist of a single table with the following attributes: _busID_, _route_, _operator_, _location_, _updated_ and _lastStop_. If we where to extend the functionality of this application it would obviously not be a good solution, but since this only is for demonstrational purposes, the single table will do just fine.
 
-I've chosen to use a _SpatiaLite_-database that extends SQLite to support spatial SQL capabilities. This enables us to easily calculate the distance between two coordniates, and we can therefore have API calls that get busses within a certain radius from a given coordinate.
+I've chosen to use a _SpatiaLite_-database that extends SQLite to support spatial SQL capabilities. This enables us to easily calculate the distance between two coordinates, and we can therefore have API calls that get busses within a certain radius from a given coordinate.
 
 The applications subscribes to the `vp`-events (vehicle position) from the MQTT server to update the position of each bus. When a new position is given, the previous position is overwritten. In other words, no location history is currently stored. The application also subscribes to `dep`-events (Vehicle departs from a stop and leaves the stop radius) from the MQTT-server. This is to update the lastStop attribute. A `vjout`-event (Vehicle signs off from a service journey, after reaching the final stop) is used to delete the bus from the database, since it's not needed anymore.
 
-One feature that currently isn't implemented is to get the next stop of a given bus. Since the MQTT server doesn't provide route information, the [Routing API](https://digitransit.fi/en/developers/apis/1-routing-api/routes/) from digitransit can be used. More specifically the **fuzzyTrip** query type will provide the details of a given bus trip ([more information availble here](https://digitransit.fi/en/developers/apis/1-routing-api/routes/#a-namefuzzytripaquery-a-trip-without-its-id)). A possible implementation would be to subscribe to `vja`-events from the MQTT server. A `vja`-event is published when a vehicle starts on a trip. When such an event occurs, we could use the fuzzyTrip query to get and save information about the bus stops for the trip of the given bus.
+One feature that currently isn't implemented is to get the next stop of a given bus. Since the MQTT server doesn't provide route information, the [Routing API](https://digitransit.fi/en/developers/apis/1-routing-api/routes/) from digitransit can be used. More specifically the **fuzzyTrip** query type will provide the details of a given bus trip ([more information available here](https://digitransit.fi/en/developers/apis/1-routing-api/routes/#a-namefuzzytripaquery-a-trip-without-its-id)). A possible implementation would be to subscribe to `vja`-events from the MQTT server. A `vja`-event is published when a vehicle starts on a trip. When such an event occurs, we could use the fuzzyTrip query to get and save information about the bus stops for the trip of the given bus.
 
 To solve the case I've used the high-frequency positioning API docs: [https://digitransit.fi/en/developers/apis/4-realtime-api/vehicle-positions/](https://digitransit.fi/en/developers/apis/4-realtime-api/vehicle-positions/)
 
-To start the surver run the following command:
+To start the server run the following command:
 
 ```shell
 python3 ./manage.py runserver
@@ -24,7 +24,7 @@ python3 ./manage.py runserver
 
 ### Get a bus by it's ID (GET)
 
-To get a bus by it's ID use a GET request to the following endpoint `bus/{bus_ID}/`
+To get a bus by it's ID use a GET request to the following endpoint: `bus/{bus_ID}/`.
 
 _Example:_
 
